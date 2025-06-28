@@ -11,6 +11,7 @@ export const useThemeStore = defineStore('theme', {
     fontSize: '16px',
     imageWidth: '200px',
     daltonMode: false,
+    paletasGuardadas: [],
   }),
   actions: {
     init() {
@@ -29,8 +30,34 @@ export const useThemeStore = defineStore('theme', {
       r.setProperty('--filter-dalton', vars.daltonMode ? 'grayscale(1)' : 'none')
     },
     save() {
-      this.apply()
       localStorage.setItem('theme', JSON.stringify(this.$state))
+      this.apply()
+    },
+    guardarPaleta(nombre) {
+      const preset = {
+        nombre,
+        palette: { ...this.palette },
+        fontFamily: this.fontFamily,
+        fontSize: this.fontSize,
+        imageWidth: this.imageWidth,
+        daltonMode: this.daltonMode,
+      }
+      this.paletasGuardadas.push(preset)
+      localStorage.setItem('paletasGuardadas', JSON.stringify(this.paletasGuardadas))
+    },
+
+    aplicarPaleta(preset) {
+      this.palette = { ...preset.palette }
+      this.fontFamily = preset.fontFamily
+      this.fontSize = preset.fontSize
+      this.imageWidth = preset.imageWidth
+      this.daltonMode = preset.daltonMode
+      this.save()
+    },
+
+    eliminarPaleta(nombre) {
+      this.paletasGuardadas = this.paletasGuardadas.filter((p) => p.nombre !== nombre)
+      localStorage.setItem('paletasGuardadas', JSON.stringify(this.paletasGuardadas))
     },
   },
 })

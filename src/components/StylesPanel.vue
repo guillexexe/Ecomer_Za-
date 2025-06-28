@@ -58,6 +58,21 @@
       </div>
 
       <button type="submit">Guardar Cambios</button>
+      <div class="palette-save">
+        <input v-model="nombrePreset" placeholder="Nombre de la paleta" />
+        <button @click="guardar">Guardar paleta</button>
+      </div>
+
+      <div v-if="theme.paletasGuardadas.length">
+        <h4>Paletas guardadas:</h4>
+        <ul>
+          <li v-for="preset in theme.paletasGuardadas" :key="preset.nombre">
+            {{ preset.nombre }}
+            <button @click="theme.aplicarPaleta(preset)">Aplicar</button>
+            <button @click="theme.eliminarPaleta(preset.nombre)">🗑️</button>
+          </li>
+        </ul>
+      </div>
     </form>
 
     <!-- Vista previa -->
@@ -72,11 +87,12 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { reactive, watch, ref } from 'vue'
 import Swal from 'sweetalert2'
 import { useThemeStore } from '@/stores/theme'
 
 const theme = useThemeStore()
+const nombrePreset = ref('')
 
 // Copia local editable
 const local = reactive({
@@ -118,6 +134,11 @@ async function onSave() {
     timer: 1500,
     showConfirmButton: false,
   })
+}
+function guardar() {
+  if (!nombrePreset.value.trim()) return
+  theme.guardarPaleta(nombrePreset.value.trim())
+  nombrePreset.value = ''
 }
 </script>
 

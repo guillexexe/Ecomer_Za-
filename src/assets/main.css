@@ -18,3 +18,19 @@ img {
   width: var(--image-width);
   height: auto;
 }
+table.dataTable {
+  background: var(--color-primary);
+  color: var(--color-accent);
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  border: 1px solid var(--color-accent);
+}
+
+table.dataTable thead {
+  background: var(--color-secondary);
+  color: var(--color-accent);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--color-accent) !important;
+}
