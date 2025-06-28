@@ -1,20 +1,20 @@
-@import './base.css';
-
-
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  --color-primary: #fff;
+  --color-secondary: #eee;
+  --color-accent: #333;
+  --font-family: Arial, sans-serif;
+  --font-size: 16px;
+  --image-width: 200px;
+  --filter-dalton: none;
 }
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
+  background: var(--color-primary);
+  color: var(--color-accent);
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  filter: var(--filter-dalton);
 }
-
-a {
-  text-decoration: none;
-  color: inherit;
+img {
+  width: var(--image-width);
+  height: auto;
 }

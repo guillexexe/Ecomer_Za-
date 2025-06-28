@@ -27,8 +27,7 @@ coverage
 *.sln
 *.sw?
 
-*.tsbuildinfo
-# Dependencias instaladas
+*.tsbuildinfo# Dependencias instaladas
 node_modules/
 
 # Carpeta de build en Vue (o Vite)

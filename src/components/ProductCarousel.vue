@@ -1,78 +1,146 @@
-<script setup>
-import { ref } from 'vue';
-
-const products = ref([
-  { id: 1, name: 'Botines de Cuero', price: '$120.00', imageUrl: 'https://images.unsplash.com/photo-1608256247964-44116035b8ca?q=80&w=300' },
-  { id: 2, name: 'Zapatillas Urbanas', price: '$85.50', imageUrl: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=300' },
-  { id: 3, name: 'Mocasines Clásicos', price: '$95.00', imageUrl: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?q=80&w=300' },
-  { id: 4, name: 'Sandalias de Verano', price: '$55.00', imageUrl: 'https://images.unsplash.com/photo-1603487742131-412903756e18?q=80&w=300' },
-  { id: 5, name: 'Zapatos de Correr', price: '$110.00', imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=300' }
-]);
-</script>
-
 <template>
-  <section id="catalogo" class="carousel-section">
-    <h2>Nuestros Destacados</h2>
-    <div class="carousel-container">
-      <div v-for="product in products" :key="product.id" class="product-card">
-        <img :src="product.imageUrl" :alt="product.name">
+  <div class="carousel-container">
+    <!-- Botón anterior -->
+    <button class="nav prev" @click="prev">&lt;</button>
+
+    <!-- Contenedor deslizante -->
+    <div class="carousel" :style="carouselStyle">
+      <div v-for="product in products" :key="product.id" class="slide">
+        <img :src="product.image" :alt="product.name" />
         <h3>{{ product.name }}</h3>
-        <p class="price">{{ product.price }}</p>
+        <p>{{ product.price }}</p>
       </div>
     </div>
-  </section>
+
+    <!-- Botón siguiente -->
+    <button class="nav next" @click="next">&gt;</button>
+
+    <!-- Indicadores (dots) -->
+    <div class="dots">
+      <span
+        v-for="(_, i) in products"
+        :key="i"
+        class="dot"
+        :class="{ active: i === currentIndex }"
+        @click="goTo(i)"
+      ></span>
+    </div>
+  </div>
 </template>
 
+<script setup>
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+
+// Importa tus assets locales (asegúrate que los nombres y rutas coincidan)
+import img1 from '@/assets/Cuero.jpg'
+import img2 from '@/assets/urbana.jpg'
+import img3 from '@/assets/Clasicos.jpg'
+import img4 from '@/assets/sandalia.jpg'
+import img5 from '@/assets/Correr.jpg'
+
+// Array de productos con la propiedad `image` en lugar de URL externa
+const products = ref([
+  { id: 1, name: 'Botines de Cuero', price: '$120.00', image: img1 },
+  { id: 2, name: 'Zapatillas Urbanas', price: '$85.50', image: img2 },
+  { id: 3, name: 'Mocasines Clásicos', price: '$95.00', image: img3 },
+  { id: 4, name: 'Sandalias de Verano', price: '$55.00', image: img4 },
+  { id: 5, name: 'Zapatos de Correr', price: '$110.00', image: img5 },
+])
+
+// Estado del índice actual
+const currentIndex = ref(0)
+const carouselStyle = computed(() => ({
+  transform: `translateX(-${currentIndex.value * 100}%)`,
+}))
+
+let timer = null
+
+// Avanza al siguiente slide
+function next() {
+  currentIndex.value = (currentIndex.value + 1) % products.value.length
+}
+
+// Retrocede al slide anterior
+function prev() {
+  currentIndex.value = (currentIndex.value - 1 + products.value.length) % products.value.length
+}
+
+// Salta a un slide concreto
+function goTo(i) {
+  currentIndex.value = i
+}
+
+// Auto-play cada 4 segundos
+onMounted(() => {
+  timer = setInterval(next, 4000)
+})
+onBeforeUnmount(() => {
+  clearInterval(timer)
+})
+</script>
+
 <style scoped>
-.carousel-section {
-  padding: 4rem 0;
+.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: auto;
+  overflow: hidden;
+}
+
+/* El contenedor de slides en fila */
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+/* Cada slide ocupa el 100% del contenedor */
+.slide {
+  flex: 0 0 100%;
+  padding: 1rem;
   text-align: center;
 }
-h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-}
-.carousel-container {
-  display: flex;
-  overflow-x: auto; /* La magia del carrusel simple */
-  scroll-snap-type: x mandatory;
-  gap: 1.5rem;
-  padding: 1rem 2rem; /* Permite ver las sombras y que no se corte */
-  scrollbar-color: #e67e22 #ecf0f1;
-}
-/* Para navegadores Webkit como Chrome, Safari */
-.carousel-container::-webkit-scrollbar {
-  height: 8px;
-}
-.carousel-container::-webkit-scrollbar-thumb {
-  background: #e67e22;
-  border-radius: 4px;
-}
-.product-card {
-  flex: 0 0 280px; /* No se encoge, no crece, base de 280px */
-  scroll-snap-align: center;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: transform 0.3s;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-}
-img {
+.slide img {
   width: 100%;
-  height: 250px;
-  object-fit: cover;
+  height: auto;
+  border-radius: 8px;
 }
-h3 {
+
+/* Flechas de navegación */
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
   font-size: 1.2rem;
-  margin: 1rem 0 0.5rem 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 2;
 }
-.price {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #e67e22;
-  margin-bottom: 1rem;
+.prev {
+  left: 0.5rem;
+}
+.next {
+  right: 0.5rem;
+}
+
+/* Dots indicadores */
+.dots {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 4px;
+  background: #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.dot.active {
+  background: #333;
 }
 </style>
