@@ -1,8 +1,8 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <nav class="header">
-    <router-link to="/" class="logo"
-      ><img :src="logo" alt="Mi Tienda" class="Paso seguro.png" />
+    <router-link to="/" class="logo">
+      <img :src="logo" alt="Mi Tienda" class="logo-img" />
     </router-link>
     <div class="spacer"></div>
 
@@ -29,39 +29,47 @@
 
           <!-- Usuario normal: editar perfil -->
           <li v-if="role === 'user'">
-            <router-link to="/profile">Editar Perfil</router-link>
+            <button class="dropdown-btn" @click="openProfile()">Editar perfil</button>
           </li>
 
           <!-- Siempre: cerrar sesión -->
           <li>
-            <button @click.prevent="logout">Cerrar sesión</button>
+            <button class="dropdown-btn" @click.prevent="logout()">Cerrar sesión</button>
           </li>
         </ul>
       </div>
     </template>
   </nav>
+
+  <!-- Monta el wizard inline cuando se abra -->
+  <UserWizard v-if="showProfileWizard" :userId="user.id" @close="closeWizard" />
 </template>
 
 <script setup>
-import logo from '@/assets/Paso seguro.png' // Ajusta ruta si lo pusiste en src/assets/
+import logo from '@/assets/Paso seguro.png'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import UserWizard from '@/components/UserWizard.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
-
-// estado dropdown
-const toggle = ref(false)
-
-// datos de usuario
 const user = computed(() => userStore.user)
 const role = computed(() => userStore.user?.role)
+const toggle = ref(false)
+const showProfileWizard = ref(false)
 
-// acción de logout
 function logout() {
   userStore.logout()
   router.push('/')
+}
+
+function openProfile() {
+  showProfileWizard.value = true
+  toggle.value = false
+}
+function closeWizard() {
+  showProfileWizard.value = false
 }
 </script>
 
@@ -73,13 +81,10 @@ function logout() {
   background: var(--color-accent);
 }
 .logo-img {
-  width: var(--img-width);
-  height: var(--img-height);
+  width: 80px;
+  height: 90px;
   object-fit: contain;
-  transform-origin: center center;
-  transform: scale(0.25); /* 50% */
 }
-
 .spacer {
   flex: 1;
 }
@@ -95,7 +100,6 @@ function logout() {
 .btn:hover {
   opacity: 0.9;
 }
-
 /* Dropdown */
 .dropdown {
   position: relative;
@@ -129,7 +133,7 @@ function logout() {
   list-style: none;
 }
 .dropdown-menu a,
-.dropdown-menu button {
+.dropdown-menu .dropdown-btn {
   display: block;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -141,7 +145,7 @@ function logout() {
   cursor: pointer;
 }
 .dropdown-menu a:hover,
-.dropdown-menu button:hover {
+.dropdown-menu .dropdown-btn:hover {
   background: var(--color-secondary);
 }
 </style>

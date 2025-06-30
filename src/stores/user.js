@@ -16,10 +16,17 @@ export const useUserStore = defineStore('user', {
       if (users.find((u) => u.email === email)) {
         throw new Error('Correo ya registrado')
       }
-      const nuevo = { email, password, role: 'user', activo: true }
+      const nuevo = {
+        id: Date.now(),
+        email,
+        password,
+        role: 'user',
+        activo: true,
+      }
+
       users.push(nuevo)
       localStorage.setItem('usuarios', JSON.stringify(users))
-      this.user = { email, role: 'user' }
+      this.user = { id: nuevo.id, email, role: 'user' }
       localStorage.setItem('sesion', JSON.stringify(this.user))
     },
     login(email, password) {
@@ -27,7 +34,11 @@ export const useUserStore = defineStore('user', {
       const u = users.find((u) => u.email === email && u.password === password)
       if (!u) throw new Error('Credenciales inválidas')
       if (!u.activo) throw new Error('Usuario deshabilitado')
-      this.user = { email: u.email, role: u.role }
+      this.user = {
+        id: nuevo.id,
+        email,
+        role: 'user',
+      }
       localStorage.setItem('sesion', JSON.stringify(this.user))
     },
     logout() {
