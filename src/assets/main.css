@@ -1,22 +1,24 @@
 :root {
-  --color-primary: #fff;
-  --color-secondary: #eee;
-  --color-accent: #333;
+  --color-primary: #ffffff;
+  --color-secondary: #f0f0f0;
+  --color-accent: #333333;
   --font-family: Arial, sans-serif;
   --font-size: 16px;
-  --image-width: 200px;
-  --filter-dalton: none;
+  --img-width: 100px;
+  --img-height: 100px;
 }
+
 body {
-  background: var(--color-primary);
-  color: var(--color-accent);
   font-family: var(--font-family);
   font-size: var(--font-size);
-  filter: var(--filter-dalton);
+  background: var(--color-primary);
+  color: var(--color-accent);
 }
-img {
-  width: var(--image-width);
-  height: auto;
+
+/* Ejemplo: logo en el header */
+header img.logo {
+  width: var(--img-width);
+  height: var(--img-height);
 }
 table.dataTable {
   background: var(--color-primary);

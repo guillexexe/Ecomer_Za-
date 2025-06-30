@@ -1,48 +1,31 @@
 <template>
-  <div class="auth-page">
-    <h2>Registrarse</h2>
-    <form @submit.prevent="onSubmit">
-      <input v-model.trim="email" type="email" placeholder="Correo electrónico" required />
-      <input
-        v-model.trim="password"
-        type="password"
-        placeholder="Contraseña (mín. 6 caracteres)"
-        minlength="6"
-        required
-      />
-      <button type="submit">Crear cuenta</button>
-    </form>
-  </div>
+  <form @submit.prevent="onSubmit">
+    <input v-model="email" type="email" placeholder="Email" required />
+    <input v-model="password" type="password" placeholder="Contraseña" required />
+    <input v-model="confirm" type="password" placeholder="Confirmar contraseña" required />
+    <button type="submit">Registrarse</button>
+  </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/user'
+import Swal from 'sweetalert2'
 
 const email = ref('')
 const password = ref('')
+const confirm = ref('')
 const userStore = useUserStore()
-const router = useRouter()
 
 async function onSubmit() {
+  if (password.value !== confirm.value) {
+    return Swal.fire('Error', 'Las contraseñas no coinciden', 'error')
+  }
   try {
-    userStore.register(email.value, password.value)
-    await Swal.fire({
-      icon: 'success',
-      title: '¡Cuenta creada!',
-      text: `Bienvenido, ${email.value}`,
-      timer: 1800,
-      showConfirmButton: false,
-    })
-    router.push('/') // redirige a Home
+    await userStore.register(email.value, password.value)
+    Swal.fire('¡OK!', 'Usuario registrado', 'success')
   } catch (err) {
-    await Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: err.message,
-    })
+    Swal.fire('Error', err.message, 'error')
   }
 }
 </script>

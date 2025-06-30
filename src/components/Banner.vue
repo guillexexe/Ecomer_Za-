@@ -11,14 +11,16 @@
 <style scoped>
 .banner {
   height: 60vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=2012&auto=format&fit=crop');
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=2012&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: #fff;
+  color: var(--color-accent);
 }
 .banner-text {
   max-width: 600px;
@@ -33,8 +35,8 @@ p {
   margin-bottom: 2rem;
 }
 .cta-button {
-  background-color: #e67e22;
-  color: white;
+  background-color: var(--color-secondary);
+  color: var(--color-accent);
   padding: 1rem 2rem;
   text-decoration: none;
   font-weight: bold;
@@ -42,6 +44,6 @@ p {
   transition: background-color 0.3s;
 }
 .cta-button:hover {
-  background-color: #d35400;
+  background-color: var(--color-secondary);
 }
 </style>

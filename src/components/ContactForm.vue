@@ -1,27 +1,27 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const name = ref('');
-const email = ref('');
-const message = ref('');
+const name = ref('')
+const email = ref('')
+const message = ref('')
 
 function handleSubmit() {
   if (!name.value || !email.value || !message.value) {
-    alert('Por favor, completa todos los campos.');
-    return;
+    alert('Por favor, completa todos los campos.')
+    return
   }
   // Aquí iría la lógica para enviar el formulario
   console.log('Enviando datos:', {
     name: name.value,
     email: email.value,
-    message: message.value
-  });
-  alert(`Gracias, ${name.value}. Hemos recibido tu mensaje.`);
-  
+    message: message.value,
+  })
+  alert(`Gracias, ${name.value}. Hemos recibido tu mensaje.`)
+
   // Limpiar el formulario
-  name.value = '';
-  email.value = '';
-  message.value = '';
+  name.value = ''
+  email.value = ''
+  message.value = ''
 }
 </script>
 
@@ -33,11 +33,11 @@ function handleSubmit() {
       <form @submit.prevent="handleSubmit" class="contact-form">
         <div class="form-group">
           <label for="name">Nombre</label>
-          <input type="text" id="name" v-model="name" required>
+          <input type="text" id="name" v-model="name" required />
         </div>
         <div class="form-group">
           <label for="email">Correo Electrónico</label>
-          <input type="email" id="email" v-model="email" required>
+          <input type="email" id="email" v-model="email" required />
         </div>
         <div class="form-group">
           <label for="message">Mensaje</label>
@@ -52,8 +52,8 @@ function handleSubmit() {
 <style scoped>
 .contact-section {
   padding: 4rem 1rem;
-  background-color: #34495e;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-accent);
 }
 .container {
   max-width: 800px;
@@ -75,17 +75,18 @@ label {
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
-input, textarea {
+input,
+textarea {
   padding: 0.8rem;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
-  background-color: #fff;
+  background-color: var(--color-accent);
 }
 button {
   padding: 1rem;
-  background-color: #e67e22;
-  color: white;
+  background-color: var(--color-secondary);
+  color: var(--color-accent);
   border: none;
   border-radius: 5px;
   font-size: 1.1rem;
@@ -94,6 +95,6 @@ button {
   transition: background-color 0.3s;
 }
 button:hover {
-  background-color: #d35400;
+  background-color: var(--color-accent);
 }
 </style>

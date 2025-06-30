@@ -1,6 +1,9 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <nav class="header">
-    <router-link to="/" class="logo">Mi Tienda</router-link>
+    <router-link to="/" class="logo"
+      ><img :src="logo" alt="Mi Tienda" class="Paso seguro.png" />
+    </router-link>
     <div class="spacer"></div>
 
     <!-- Si no hay user, mostramos login/register -->
@@ -40,6 +43,7 @@
 </template>
 
 <script setup>
+import logo from '@/assets/Paso seguro.png' // Ajusta ruta si lo pusiste en src/assets/
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -68,11 +72,14 @@ function logout() {
   padding: 0.5rem 1rem;
   background: var(--color-accent);
 }
-.logo {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-size: 1.4rem;
+.logo-img {
+  width: var(--img-width);
+  height: var(--img-height);
+  object-fit: contain;
+  transform-origin: center center;
+  transform: scale(0.25); /* 50% */
 }
+
 .spacer {
   flex: 1;
 }

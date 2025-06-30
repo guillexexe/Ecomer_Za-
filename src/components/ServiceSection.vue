@@ -36,7 +36,7 @@ const services = ref([
 <style scoped>
 .services {
   padding: 4rem 1rem;
-  background-color: #ecf0f1;
+  background-color: var(--color-primary);
 }
 .container {
   max-width: 1200px;
@@ -63,6 +63,6 @@ const services = ref([
 
 h3 {
   margin-bottom: 0.5rem;
-  color: #2c3e50;
+  color: var(--color-accent);
 }
 </style>

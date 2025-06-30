@@ -1,67 +1,132 @@
 <template>
-  <section class="admin-users">
-    <h2>Usuarios registrados</h2>
-    <DataTable class="display" :data="usuarios" :columns="columnas">
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Rol</th>
-          <th>Activo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-    </DataTable>
-  </section>
+  <div class="admin-page">
+    <h1>Panel de Administración</h1>
+    <!-- …aquí irían los controles de estilo… -->
+
+    <!-- Gestión de usuarios -->
+    <section class="user-management">
+      <h2>Usuarios registrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="u in users" :key="u.email">
+            <td>{{ u.email }}</td>
+            <td>{{ u.role }}</td>
+            <td>{{ u.activo ? 'Sí' : 'No' }}</td>
+            <td>
+              <button class="btn-toggle" @click="confirmToggle(u.email, u.activo)">
+                {{ u.activo ? 'Deshabilitar' : 'Habilitar' }}
+              </button>
+              <button class="btn-role" @click="confirmRole(u.email, u.role)">
+                Rol: {{ u.role }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUpdated } from 'vue'
+import { ref, onMounted } from 'vue'
+import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
-const usuarios = ref([])
-const columnas = [
-  { title: 'Email', data: 'email' },
-  { title: 'Rol', data: 'role' },
-  { title: 'Activo', data: 'activo', render: (data) => (data ? '✅' : '❌') },
-  {
-    title: 'Acciones',
-    data: null,
-    render: (data, type, row) => {
-      return `
-        <button class="btn-activar">${row.activo ? 'Deshabilitar' : 'Habilitar'}</button>
-        <button class="btn-rol">Rol</button>
-      `
-    },
-  },
-]
+const users = ref([])
+
+function loadUsers() {
+  users.value = userStore.getAllUsers()
+}
 
 onMounted(() => {
-  usuarios.value = userStore.getAllUsers()
+  loadUsers()
 })
 
-onUpdated(() => {
-  document.querySelectorAll('.btn-activar').forEach((btn, i) => {
-    btn.onclick = () => {
-      const email = usuarios.value[i].email
-      userStore.toggleUserActive(email)
-      usuarios.value = userStore.getAllUsers()
-    }
+async function confirmToggle(email, isActive) {
+  const { value } = await Swal.fire({
+    title: `${isActive ? 'Deshabilitar' : 'Habilitar'} usuario`,
+    text: `¿Seguro que deseas ${isActive ? 'deshabilitar' : 'habilitar'} ${email}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí',
+    cancelButtonText: 'No',
   })
-  document.querySelectorAll('.btn-rol').forEach((btn, i) => {
-    btn.onclick = async () => {
-      const u = usuarios.value[i]
-      const nuevo = u.role === 'admin' ? 'user' : 'admin'
-      userStore.setUserRole(u.email, nuevo)
-      usuarios.value = userStore.getAllUsers()
-    }
+  if (value) {
+    userStore.toggleUserActive(email)
+    loadUsers()
+    Swal.fire(
+      '¡Hecho!',
+      `El usuario ${email} ha sido ${isActive ? 'deshabilitado' : 'habilitado'}.`,
+      'success',
+    )
+  }
+}
+
+async function confirmRole(email, currentRole) {
+  const { value: role } = await Swal.fire({
+    title: `Cambiar rol de ${email}`,
+    input: 'select',
+    inputOptions: { user: 'User', admin: 'Admin' },
+    inputValue: currentRole,
+    showCancelButton: true,
   })
-})
+  if (role && role !== currentRole) {
+    userStore.setUserRole(email, role)
+    loadUsers()
+    Swal.fire('¡Hecho!', `El rol de ${email} es ahora ${role}.`, 'success')
+  }
+}
+// en AdminPage.vue, dentro del método que dispara la exportación:
+async function exportPDF() {
+  const pdfMake = (await import('pdfmake/build/pdfmake')).default
+  const pdfFonts = (await import('pdfmake/build/vfs_fonts')).default
+  pdfMake.vfs = pdfFonts.pdfMake.vfs
+  // …el resto de tu configuración y llamada a pdfMake …
+}
 </script>
 
 <style scoped>
-.admin-users {
-  max-width: 1000px;
+.admin-page {
+  max-width: 800px;
   margin: 2rem auto;
+  padding: 1rem;
+}
+.user-management {
+  margin-top: 2rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+.btn-toggle,
+.btn-role {
+  margin-right: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-toggle {
+  background: #e67e22;
+  color: white;
+}
+.btn-role {
+  background: #3498db;
+  color: white;
 }
 </style>

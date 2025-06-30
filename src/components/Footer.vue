@@ -3,8 +3,7 @@
     <div class="container">
       <p>&copy; 2025 Zapatería El Paso Firme. Todos los derechos reservados.</p>
       <div class="social-links">
-        <a href="#">Facebook</a> | 
-        <a href="#">Instagram</a> | 
+        <a href="#">Facebook</a> | <a href="#">Instagram</a> |
         <a href="#">Twitter</a>
       </div>
     </div>
@@ -13,8 +12,8 @@
 
 <style scoped>
 .footer {
-  background-color: #2c3e50;
-  color: #ecf0f1;
+  background-color: var(--color-primary);
+  color: var(--color-accent);
   padding: 2rem 1rem;
   text-align: center;
 }
@@ -26,12 +25,12 @@
   margin-top: 1rem;
 }
 .social-links a {
-  color: #ecf0f1;
+  color: var(--color-accent);
   text-decoration: none;
   margin: 0 0.5rem;
   transition: color 0.3s;
 }
 .social-links a:hover {
-  color: #e67e22;
+  color: var(--color-accent);
 }
 </style>
