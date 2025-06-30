@@ -17,6 +17,7 @@ export const useThemeStore = defineStore('theme', {
       width: 100, // px
       height: 100, // px
     },
+    colorBlind: false,
   }),
 
   actions: {
@@ -29,6 +30,7 @@ export const useThemeStore = defineStore('theme', {
         this.currentId = data.currentId
         this.typography = data.typography
         this.imageSize = data.imageSize
+        this.colorBlind = data.colorBlind ?? false
       } else {
         // Primer arranque: crea paleta Default
         this.palettes = [
@@ -54,6 +56,7 @@ export const useThemeStore = defineStore('theme', {
         currentId: this.currentId,
         typography: this.typography,
         imageSize: this.imageSize,
+        colorBlind: this.colorBlind,
       }
       localStorage.setItem('themeData', JSON.stringify(payload))
     },
@@ -66,6 +69,7 @@ export const useThemeStore = defineStore('theme', {
         document.documentElement.style.setProperty('--color-primary', p.colors.primary)
         document.documentElement.style.setProperty('--color-secondary', p.colors.secondary)
         document.documentElement.style.setProperty('--color-accent', p.colors.accent)
+        document.documentElement.classList.toggle('daltonism', this.colorBlind)
       }
 
       // 2) Tipografía

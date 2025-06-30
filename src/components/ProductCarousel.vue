@@ -1,27 +1,20 @@
 <template>
   <div class="carousel-container">
-    <!-- Botón anterior -->
     <button class="nav prev" @click="prev">&lt;</button>
-
-    <!-- Contenedor deslizante -->
-    <div class="carousel" :style="carouselStyle">
-      <div v-for="product in products" :key="product.id" class="slide">
+    <div class="carousel" ref="carouselRef" :style="carouselVars">
+      <div v-for="(product, index) in clonedProducts" :key="index" class="slide">
         <img :src="product.image" :alt="product.name" />
         <h3>{{ product.name }}</h3>
         <p>{{ product.price }}</p>
       </div>
     </div>
-
-    <!-- Botón siguiente -->
     <button class="nav next" @click="next">&gt;</button>
-
-    <!-- Indicadores (dots) -->
     <div class="dots">
       <span
         v-for="(_, i) in products"
         :key="i"
         class="dot"
-        :class="{ active: i === currentIndex }"
+        :class="{ active: i === activeDotIndex }"
         @click="goTo(i)"
       ></span>
     </div>
@@ -29,16 +22,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-
-// Importa tus assets locales (asegúrate que los nombres y rutas coincidan)
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import img1 from '@/assets/Cuero.jpg'
 import img2 from '@/assets/urbana.jpg'
 import img3 from '@/assets/Clasicos.jpg'
 import img4 from '@/assets/sandalia.jpg'
 import img5 from '@/assets/Correr.jpg'
 
-// Array de productos con la propiedad `image` en lugar de URL externa
+// --- ESTADO Y DATOS ---
 const products = ref([
   { id: 1, name: 'Botines de Cuero', price: '$120.00', image: img1 },
   { id: 2, name: 'Zapatillas Urbanas', price: '$85.50', image: img2 },
@@ -46,101 +37,172 @@ const products = ref([
   { id: 4, name: 'Sandalias de Verano', price: '$55.00', image: img4 },
   { id: 5, name: 'Zapatos de Correr', price: '$110.00', image: img5 },
 ])
-
-// Estado del índice actual
+const carouselRef = ref(null)
 const currentIndex = ref(0)
+const isTransitioning = ref(true)
+
+// --- LÓGICA RESPONSIVA (¡NUEVO!) ---
+const windowWidth = ref(window.innerWidth)
+
+// 1. Calculamos cuántos items mostrar según el ancho de la ventana
+const itemsToShow = computed(() => {
+  if (windowWidth.value > 1024) return 3 // Escritorios grandes
+  if (windowWidth.value > 768) return 2 // Tablets y escritorios pequeños
+  return 1 // Móviles
+})
+
+// 2. Escuchamos el evento 'resize' para actualizar el ancho
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+onMounted(() => window.addEventListener('resize', handleResize))
+onBeforeUnmount(() => window.removeEventListener('resize', handleResize))
+
+// --- LÓGICA DEL LOOP INFINITO (ADAPTADA) ---
+
+// 3. `clonesCount` ahora debe ser una propiedad computada para reaccionar a `itemsToShow`
+const clonesCount = computed(() => itemsToShow.value)
+
+const clonedProducts = computed(() => [
+  ...products.value.slice(-clonesCount.value),
+  ...products.value,
+  ...products.value.slice(0, clonesCount.value),
+])
+
+// 4. El índice inicial también debe ser reactivo
+watch(
+  clonesCount,
+  (newCount) => {
+    currentIndex.value = newCount
+  },
+  { immediate: true },
+)
+
+// El resto de la lógica se mantiene, ya que es reactiva a los cambios de las propiedades computadas
 const carouselStyle = computed(() => ({
-  transform: `translateX(-${currentIndex.value * 100}%)`,
+  transform: `translateX(-${currentIndex.value * (100 / itemsToShow.value)}%)`,
+  transition: isTransitioning.value ? 'transform 0.5s ease' : 'none',
+}))
+
+const carouselVars = computed(() => ({
+  ...carouselStyle.value,
+  '--items-to-show': itemsToShow.value,
 }))
 
 let timer = null
-
-// Avanza al siguiente slide
 function next() {
-  currentIndex.value = (currentIndex.value + 1) % products.value.length
+  currentIndex.value++
+  resetTimer()
 }
-
-// Retrocede al slide anterior
 function prev() {
-  currentIndex.value = (currentIndex.value - 1 + products.value.length) % products.value.length
+  currentIndex.value--
+  resetTimer()
+}
+function goTo(slideIndex) {
+  currentIndex.value = slideIndex + clonesCount.value
+  resetTimer()
 }
 
-// Salta a un slide concreto
-function goTo(i) {
-  currentIndex.value = i
-}
-
-// Auto-play cada 4 segundos
-onMounted(() => {
-  timer = setInterval(next, 4000)
+watch(currentIndex, (newIndex) => {
+  const jumpThreshold = products.value.length + clonesCount.value
+  if (newIndex >= jumpThreshold) {
+    setTimeout(() => {
+      isTransitioning.value = false
+      currentIndex.value = clonesCount.value
+    }, 500)
+  } else if (newIndex < clonesCount.value) {
+    setTimeout(() => {
+      isTransitioning.value = false
+      currentIndex.value = jumpThreshold - 1
+    }, 500)
+  } else if (!isTransitioning.value) {
+    setTimeout(() => {
+      isTransitioning.value = true
+    }, 50)
+  }
 })
-onBeforeUnmount(() => {
+
+const activeDotIndex = computed(() => {
+  return (currentIndex.value - clonesCount.value + products.value.length) % products.value.length
+})
+
+function resetTimer() {
   clearInterval(timer)
-})
+  timer = setInterval(next, 4000)
+}
+onMounted(() => resetTimer())
+onBeforeUnmount(() => clearInterval(timer))
 </script>
 
 <style scoped>
+/* El CSS se mantiene casi idéntico, ya que ahora es controlado por la variable --items-to-show */
 .carousel-container {
   position: relative;
-  width: 100%;
-  max-width: 360px;
+  width: 90%;
   margin: auto;
   overflow: hidden;
 }
-
-/* El contenedor de slides en fila */
 .carousel {
   display: flex;
-  transition: transform 0.5s ease;
 }
-
-/* Cada slide ocupa el 100% del contenedor */
 .slide {
-  flex: 0 0 100%;
-  padding: 1rem;
+  flex: 0 0 calc(100% / var(--items-to-show));
+  padding: 0.5rem; /* Menos padding para que quepan mejor */
   text-align: center;
+  box-sizing: border-box;
 }
 .slide img {
-  width: 100%;
-  height: auto;
+  width: var(--img-width, 100%);
+  height: var(--img-height, 200px);
   border-radius: 8px;
+  object-fit: cover;
+  margin: 0 auto; /* Centrar la imagen si es más pequeña que el slide */
 }
-
-/* Flechas de navegación */
+/* ... el resto de tus estilos para .nav, .dots, h3, p, etc. ... */
+h3 {
+  color: var(--color-accent, #333);
+}
+p {
+  color: var(--color-accent, #e67e22);
+  font-weight: bold;
+}
 .nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  cursor: pointer;
   z-index: 2;
+  background: var(--color-secondary, rgba(255, 255, 255, 0.7));
+  border-radius: 50%;
+  border: 1px solid var(--color-accent, #ddd);
+  color: var(--color-accent, #333);
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1.5rem;
 }
 .prev {
-  left: 0.5rem;
+  left: -20px;
 }
 .next {
-  right: 0.5rem;
+  right: -20px;
 }
-
-/* Dots indicadores */
 .dots {
   text-align: center;
-  margin-top: 0.5rem;
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
 }
 .dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin: 0 4px;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
   background: #ccc;
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.3s;
 }
 .dot.active {
-  background: #333;
+  background: var(--color-accent, #333);
 }
 </style>

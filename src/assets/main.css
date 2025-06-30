@@ -7,12 +7,37 @@
   --img-width: 100px;
   --img-height: 100px;
 }
+@font-face {
+  font-family: 'Roboto'; /* El nombre que usarás en tu app */
+  src: url('./fonts/Roboto-Regular.woff2') format('woff2'); /* Ruta al archivo */
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./fonts/Montserrat-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+input,
+button,
+select,
+label {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  background: var(--color-primary);
+  color: var(--color-accent);
+}
 
 body {
   font-family: var(--font-family);
   font-size: var(--font-size);
   background: var(--color-primary);
   color: var(--color-accent);
+}
+html.daltonism {
+  filter: grayscale(100%) contrast(1.1);
 }
 
 /* Ejemplo: logo en el header */

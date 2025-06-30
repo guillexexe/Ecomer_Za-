@@ -3,7 +3,6 @@ import Banner from '@/components/Banner.vue'
 import ServiceSection from '@/components/ServiceSection.vue'
 import ProductCarousel from '@/components/ProductCarousel.vue'
 import ContactForm from '@/components/ContactForm.vue'
-import Footer from '@/components/Footer.vue'
 </script>
 
 <template>
@@ -12,7 +11,6 @@ import Footer from '@/components/Footer.vue'
     <ServiceSection />
     <ProductCarousel />
     <ContactForm />
-    <Footer />
   </div>
 </template>
 
