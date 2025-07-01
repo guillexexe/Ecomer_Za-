@@ -35,7 +35,7 @@ export const useUserStore = defineStore('user', {
       if (!u) throw new Error('Credenciales inválidas')
       if (!u.activo) throw new Error('Usuario deshabilitado')
       this.user = {
-        id: nuevo.id,
+        id: u.id,
         email,
         role: 'user',
       }
